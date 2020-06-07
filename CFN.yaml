@@ -1,0 +1,26 @@
+Parameters:
+  InstanceTypeParameter:
+    Type: String
+    Default: t3a.micro
+    Description: Choose Instance Family to Launch
+
+  AmazonMachineImage:
+    Type: String
+    Default: '{{resolve:secretsmanager:CFN_Secrets:SecretString:AMI}}'
+
+Resources:
+  EIPAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      InstanceId:
+        Ref: jumpbox
+      EIP: '{{resolve:secretsmanager:CFN_Secrets:SecretString:EIP}}'
+  jumpbox:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId:
+        Ref: AmazonMachineImage
+      KeyName: '{{resolve:secretsmanager:CFN_Secrets:SecretString:KeyName}}'
+      SecurityGroupIds: ['{{resolve:secretsmanager:CFN_Secrets:SecretString:SecurityGroup}}']
+      InstanceType:
+        Ref: InstanceTypeParameter
